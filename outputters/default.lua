@@ -50,7 +50,7 @@ outputter.test_error = function(name, suite, err)
 end
 
 outputter.test_finished = function(name, suite, result)
-	print(suite.name .. "." .. name .. " finished, taking " .. tostring(result.duration * 1000) .. "ms")
+	print("Finished test " .. suite.name .. "." .. name .. ", taking " .. tostring(result.duration * 1000) .. "ms")
 end
 
 return outputter
