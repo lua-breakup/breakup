@@ -48,7 +48,7 @@ return {
 		        runner.hooks = require "outputters/default"
 		    end
 		    runner:add_suite("assertions_test")
-		    local results = runner:run()
+		    local results = runner:run(args.coverage)
 		    os.exit(#results.errors + #results.failed_suites)
 		end,
 	},

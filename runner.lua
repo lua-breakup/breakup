@@ -1,5 +1,6 @@
 local has_socket, socket = pcall(require, "socket")
 local has_posix, posix = pcall(require, "posix")
+local has_luacov, luacov = pcall(require, "luacov.runner")
 local now = 
     has_socket and socket.gettime or
     has_posix and posix.gettimeofday and
@@ -42,6 +43,10 @@ function concat_tables(t1,t2)
         t1[#t1+1] = t2[i]
     end
     return t1
+end
+
+function framework:scan_test_files()
+
 end
 
 function framework:create_error_handler(name, suite)
@@ -115,8 +120,9 @@ function framework:run_suite(name, suite)
     return result
 end
 
-function framework:run()
+function framework:run(coverage)
     if self.hooks.started then self.hooks.started(self.suites, self.failed_suites) end
+    self.coverage = (coverage and has_luacov and true) or false
     local result = {}
     result.start_time = now()
     result.suites = {}
@@ -125,6 +131,12 @@ function framework:run()
     result.loaded_suites = self.suites
     result.failed_suites = self.failed_suites
 
+    if self.coverage then
+        if type(coverage) == 'string' then
+            luacov.load_config({statsfile=coverage})
+        end
+        luacov.init()
+    end
     for sname, suite in pairs(self.suites) do
         result.suites[sname] = self:run_suite(sname, suite)
         for k,v in pairs(result.suites[sname].tests) do
@@ -135,6 +147,9 @@ function framework:run()
 
     result.end_time = now()
     result.duration = result.end_time - result.start_time
+    if self.coverage then
+        result.coverage = luacov.data
+    end
     if self.hooks.finished then self.hooks.finished(result) end
     return result
 end
