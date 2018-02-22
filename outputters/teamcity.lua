@@ -16,6 +16,16 @@ outputter.started = function(results, suites)
 end
 
 outputter.finished = function(results)
+	if results.coverage then
+		local processor = require"../coverage_processor"
+		local covered, total = 0, 0
+		for k,v in pairs(processor.process(results.coverage)) do
+			covered = covered + v.hits
+			total = total + v.total
+		end
+		print("##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='" .. e(total) .. "']")
+	print("##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='" .. e(covered) .. "']")
+	end
 	print("##teamcity[blockClosed name='Breakup']")
 end
 

@@ -12,6 +12,17 @@ end
 
 outputter.finished = function(results)
 	print("Finished LuaTest tests, taking " .. tostring(results.duration * 1000) .. "ms")
+	if results.coverage then
+		local processor = require"../coverage_processor"
+		local covered, total = 0, 0
+		for k,v in pairs(processor.process(results.coverage)) do
+			print(k)
+			print("\t" .. tostring(v.hits) .. " out of " .. tostring(v.total) .. " lines covered.")
+			covered = covered + v.hits
+			total = total + v.total
+		end
+		print("Total: " .. tostring(covered) .. " out of " .. tostring(total) .. " lines covered.")
+	end
 	print(tostring(tl(results.tests) - tl(results.errors)) .. " out of " .. tostring(tl(results.tests)) .. " tests succeeded")
 	if tl(results.errors) > 0 then
 		print(string.char(27) .. "[31m" .. tostring(tl(results.errors)) .. " tests failed!" .. string.char(27) .. "[0m")
