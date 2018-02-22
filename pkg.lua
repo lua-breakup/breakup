@@ -27,10 +27,9 @@ return {
 	dependencies={},
 	main='runner',
 	scripts={
-		test=function(arg)
+		test=function(...)
 			local args = {}
-			for k,v in ipairs(arg) do
-				print(arg)
+			for k,v in ipairs({...}) do
 			    if switch_value(v) ~= nil then
 			        args[switch_name(v)] = switch_value(v)
 			    else
