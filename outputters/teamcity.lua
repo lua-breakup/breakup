@@ -23,9 +23,9 @@ outputter.finished = function(results)
 			covered = covered + v.hits
 			total = total + v.total
 		end
-	end
-	print("##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='" .. e(total) .. "']")
+		print("##teamcity[buildStatisticValue key='CodeCoverageAbsLTotal' value='" .. e(total) .. "']")
 	print("##teamcity[buildStatisticValue key='CodeCoverageAbsLCovered' value='" .. e(covered) .. "']")
+	end
 	print("##teamcity[blockClosed name='Breakup']")
 end
 
