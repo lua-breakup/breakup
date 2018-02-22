@@ -140,12 +140,13 @@ function assertions.assert_lte(lim, val, msg)
 end
 
 function assertions.assert_len(len, val, msg)
-	if type(val) == 'number' or type(val) == 'boolean' then
-		error(error_table_adv("number or boolean", type(val), msg, "not type ", nil))
+	if type(val) == 'string' or type(val) == 'table' then
+		if #val ~= len then
+			error(error_table_adv(len, #val, msg, "length "))
+		end
+		return
 	end
-	if #val ~= len then
-		error(error_table_adv(len, #val, msg, "length "))
-	end
+	error(error_table_adv("string or table", type(val), msg, "type ", nil))
 end
 
 function assertions.assert_map_size(len, val, msg)
