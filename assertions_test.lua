@@ -229,16 +229,57 @@ function tests:assert_len()
 	end, "assert_len should fail when the length of the list doesn't match expected.")
 	asserts.assert_error(function()
 		asserts.assert_len(4, {"a", false, nil, 3, {}}, "assert_len should fail when the length of the list doesn't match expected and when a message is provided.")
-	end)
+	end, "assert_len should fail when the length of the list doesn't match expected and a message is provided.")
 	asserts.assert_error(function()
 		asserts.assert_len(4, "abcde")
 	end, "assert_len should fail when the length of the string doesn't match expected.")
 	asserts.assert_error(function()
 		asserts.assert_len(4, "abcde", "assert_len should fail when the length of the string doesn't match expected and when a message is provided.")
-	end)
+	end, "assert_len should fail when the length of the string doesn't match expected and a message is provided.")
+	asserts.assert_error(function()
+		asserts.assert_len(5, nil)
+	end, "assert_len should fail when value is nil.")
+	asserts.assert_error(function()
+		asserts.assert_len(5, nil, "This should fail.")
+	end, "assert_len should fail when value is nil and message is provided.")
 	asserts.assert_error(function()
 		asserts.assert_len(4, 4)
-	end)
+	end, "assert_len should fail when an invalid value is passed.")
+	asserts.assert_error(function()
+		asserts.assert_len(4, 4, "This should fail.")
+	end, "assert_len should fail when an invalid value is passed and a message is provided.")
+end
+
+function tests:assert_map_size()
+	local trash_map = {}
+	trash_map["a"] = "appelsap"
+	trash_map[2] = 1
+	trash_map[{3, b = 4}] = {a="test"}
+	trash_map["b"] = "boo"
+	trash_map[1] = "Look!"
+	asserts.assert_map_size(5, trash_map)
+	asserts.assert_map_size(5, trash_map, "assert_map_size for object with proper size and message shouldn't fail.")
+	asserts.assert_error(function()
+		asserts.assert_map_size(4, trash_map)
+	end, "assert_map_size should fail when the size doesn't match.")
+	asserts.assert_error(function()
+		asserts.assert_map_size(4, trash_map, "This should fail.")
+	end, "assert_map_size should fail when size doesn't match and a message is provided.")
+end
+
+function tests:assert_match()
+	local match = "^[0-9]+$"
+	local matching_string = "123"
+	local not_matching_string = "12a3"
+
+	asserts.assert_match(match, matching_string)
+	asserts.assert_match(match, matching_string, "assert_match for matching string shouldn't fail.")
+	asserts.assert_error(function()
+		asserts.assert_match(match, not_matching_string)
+	end, "assert_match should fail when a string is provided that doesn't match.")
+	asserts.assert_error(function()
+		asserts.assert_match(match, not_matching_string, "This should fail.")
+	end, "assert_match should fail when a string is provided that doesn't match and a message is provided.")
 end
 
 function tests:assert_error()
