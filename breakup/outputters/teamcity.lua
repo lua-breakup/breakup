@@ -17,7 +17,7 @@ end
 
 outputter.finished = function(results)
 	if results.coverage then
-		local processor = require"../coverage_processor"
+		local processor = require"breakup.coverage_processor"
 		local covered, total = 0, 0
 		for k,v in pairs(processor.process(results.coverage)) do
 			covered = covered + v.hits

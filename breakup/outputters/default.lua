@@ -13,7 +13,7 @@ end
 outputter.finished = function(results)
 	print("Finished LuaTest tests, taking " .. tostring(results.duration * 1000) .. "ms")
 	if results.coverage then
-		local processor = require"../coverage_processor"
+		local processor = require"breakup.coverage_processor"
 		local covered, total = 0, 0
 		for k,v in pairs(processor.process(results.coverage)) do
 			print(k)

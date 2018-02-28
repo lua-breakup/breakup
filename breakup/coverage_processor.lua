@@ -1,5 +1,5 @@
 local reporter = {}
-local scanner = (require"luacov/reporter").LineScanner
+local scanner = (require"luacov.reporter").LineScanner
 
 function reporter.process(data)
 	result = {}

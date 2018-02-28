@@ -1,6 +1,6 @@
 local tests = {}
 
-local asserts = require "assertions"
+local asserts = require "breakup.assertions"
 
 function tests:assert_true()
 	asserts.assert_true(true)

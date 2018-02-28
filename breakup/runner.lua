@@ -1,6 +1,8 @@
 local has_socket, socket = pcall(require, "socket")
 local has_posix, posix = pcall(require, "posix")
 local has_luacov, luacov = pcall(require, "luacov.runner")
+local argparse = require"argparse.parse"
+local pairsSorted = (require"harmonize.util").pairsSorted
 local now = 
     has_socket and socket.gettime or
     has_posix and posix.gettimeofday and
@@ -38,15 +40,11 @@ local function to_suite(path, mod)
     return suite
 end
 
-function concat_tables(t1,t2)
+local function concat_tables(t1,t2)
     for i=1,#t2 do
         t1[#t1+1] = t2[i]
     end
     return t1
-end
-
-function framework:scan_test_files()
-
 end
 
 function framework:create_error_handler(name, suite)
@@ -107,7 +105,7 @@ function framework:run_suite(name, suite)
     result.tests = {}
     result.errors = {}
 
-    for tname, test in pairs(suite.tests) do
+    for tname, test in pairsSorted(suite.tests) do
         result.tests[tname] = self:run_test(suite, tname, test)
         if not result.tests[tname].ok then
             result.errors[#result.errors + 1] = tname
@@ -120,7 +118,7 @@ function framework:run_suite(name, suite)
     return result
 end
 
-function framework:run(coverage)
+function framework:start(coverage)
     if self.hooks.started then self.hooks.started(self.suites, self.failed_suites) end
     self.coverage = (coverage and has_luacov and true) or false
     local result = {}
@@ -137,7 +135,7 @@ function framework:run(coverage)
         end
         luacov.init()
     end
-    for sname, suite in pairs(self.suites) do
+    for sname, suite in pairsSorted(self.suites) do
         result.suites[sname] = self:run_suite(sname, suite)
         for k,v in pairs(result.suites[sname].tests) do
             result.tests[sname .. "." .. k] = v
@@ -152,6 +150,17 @@ function framework:run(coverage)
     end
     if self.hooks.finished then self.hooks.finished(result) end
     return result
+end
+
+function framework:run(arg)
+    local args = argparse(arg)
+    if args.outputter then
+        self.hooks = require(args.outputter)
+    else
+        self.hooks = require "breakup.outputters.default"
+    end
+    local results = self:start(args.coverage)
+    return #results.errors + #results.failed_suites
 end
 
 return framework
