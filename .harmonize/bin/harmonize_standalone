@@ -1,0 +1,52 @@
+#!/bin/bash
+
+CMD="lua5.2"
+LUA_CMD="$CMD"
+
+export LUA_PATH="$(pwd)/.?/init.lua;$(pwd)/.?.lua;$(pwd)/harmonize_modules/?/init.lua;$(pwd)/harmonize_modules/?.lua;$(pwd)/?/init.lua;;"
+export LUA_CPATH="$(pwd)/harmonize_modules/?.so;;"
+
+while true; do
+    case "$1" in
+        -l|--lua)
+            CMD="$2"
+            shift 2
+            ;;
+        --lua-cmd)
+            LUA_CMD="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+if [[ $CMD == love* ]]; then
+    PKGNAME="$($LUA_CMD -e "print((require\"pkg\").name)")"
+    [ -f main.lua ]; HAS_MAIN=$?
+    [ -f conf.lua ]; HAS_CONF=$?
+
+    # Create löve entrypoint
+    if [ $HAS_MAIN -ne 0 ]; then
+        echo "require \"harmonize.cli\"" > main.lua
+    fi
+
+    # Configure löve to run headless
+    if [ $HAS_CONF -ne 0 ]; then
+        printf "function love.conf(t)\n\tt.window=false\nend" > conf.lua
+    fi
+
+    $CMD . "$PKGNAME" $@
+
+    # Cleanup
+    if [ $HAS_MAIN -ne 0 ]; then rm main.lua; fi
+    if [ $HAS_CONF -ne 0 ]; then rm conf.lua; fi
+else
+    PKGNAME="$($CMD -e "print((require\"pkg\").name)")"
+    $CMD .harmonize/cli.lua "$PKGNAME" $@
+fi
